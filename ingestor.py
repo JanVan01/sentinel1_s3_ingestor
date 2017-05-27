@@ -4,7 +4,7 @@ from search.base import BaseSearch
 from search.copernicus import CopernicusSearch
 from upload.base import BaseUploader
 from upload.s3 import S3Uploader
-
+import credentials
 
 class Ingestor:
 
@@ -21,7 +21,7 @@ class Ingestor:
 
 
 if __name__ == '__main__':
-    search = CopernicusSearch('guest', 'guest')
+    search = CopernicusSearch(credentials.copernicus_hub['username'],credentials.copernicus_hub['password'])
     downloader = CopernicusDownloader()
     uploader = S3Uploader()
     ingestor = Ingestor(search, downloader, uploader)
