@@ -26,5 +26,3 @@ if __name__ == '__main__':
     uploader = S3Uploader()
     ingestor = Ingestor(search, downloader, uploader)
     ingestor.ingest()
-
-
