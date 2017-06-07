@@ -6,9 +6,9 @@ from upload.base import BaseUploader
 from upload.s3 import S3Uploader
 import credentials
 
-class Ingestor:
 
-    def __init__(self, search: BaseSearch, downloader:BaseDownloader, uploader:BaseUploader):
+class Ingestor:
+    def __init__(self, search: BaseSearch, downloader: BaseDownloader, uploader: BaseUploader):
         self.search = search
         self.downloader = downloader
         self.uploader = uploader
@@ -16,15 +16,12 @@ class Ingestor:
     def ingest(self):
         result = self.search.search()
         path = self.downloader.download(result)
-        self.uploader.upload(path)
-
+        self.uploader.upload(path, "path/on/server")
 
 
 if __name__ == '__main__':
-    search = CopernicusSearch(credentials.copernicus_hub['username'],credentials.copernicus_hub['password'])
+    search = CopernicusSearch(credentials.copernicus_hub['username'], credentials.copernicus_hub['password'])
     downloader = CopernicusDownloader()
-    uploader = S3Uploader()
+    uploader = S3Uploader(credentials.s3_bucket['name'])
     ingestor = Ingestor(search, downloader, uploader)
     ingestor.ingest()
-
-
