@@ -206,3 +206,6 @@ ENV/
 /site
 
 # End of https://www.gitignore.io/api/macos,linux,python,pycharm
+
+.idea/
+credentials.py
