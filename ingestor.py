@@ -6,14 +6,14 @@ import credentials
 
 
 class Ingestor:
-    def __init__(self, api: BaseAPI, uploader: BaseUploader):
+    def __init__(self, api, uploader):
         self.__api = api
         self.__uploader = uploader
 
     def ingest(self):
         result = self.__api.search()
         path = self.__api.download(result)
-        self.__uploader.upload(path, "path/on/server")
+        #self.__uploader.upload(path, "path/on/server")
 
 
 if __name__ == '__main__':

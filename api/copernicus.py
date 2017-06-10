@@ -1,10 +1,8 @@
 from api.base import BaseAPI
-from sentinelsat.sentinel import SentinelAPI
+from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt, InvalidChecksumError
+import requests
 
-COORDINATES = '5.497222679018508 50.145373303201524,10.066142408522333 50.145373303201524,10.066142408522333 ' \
-              '52.60662673233318,5.497222679018508 52.60662673233318,5.497222679018508 50.145373303201524 '
-
-INITIAL_DATE = '20160101'
+INITIAL_DATE = '20170609'
 
 
 class CopernicusAPI(BaseAPI):
@@ -13,11 +11,23 @@ class CopernicusAPI(BaseAPI):
 
     def search(self):
         print('copernicus api')
-        results = self.__api.query(area=COORDINATES, initial_date=INITIAL_DATE, platformname='Sentinel-1',
+        print('reading extend...')
+        footprint = geojson_to_wkt(read_geojson('extend.geojson'))
+        print('getting search results...')
+        results = self.__api.query(footprint, initial_date=INITIAL_DATE, platformname='Sentinel-1',
                                    producttype='GRD')
 
         return results
 
-    def download(self, url):
-        print('downloading the file at: {}'.format(url))
-        return 'path/to/file'
+    # start downloading
+    def download(self, products):
+        downloadedProducts = []
+        for product in products:
+            # download product,
+            try:
+                # verify the downloaded file's integrity by checking its MD5 checksum
+                downloadResults = self.__api.download(product, checksum=True)
+                downloadedProducts.append(downloadResults['path'])
+            except InvalidChecksumError:
+                print "ERROR: Invalid checksum, skipping %" % product
+        return downloadedProducts

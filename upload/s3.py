@@ -8,12 +8,13 @@ from upload.base import BaseUploader
 
 class S3Uploader(BaseUploader):
 
-    def __init__(self, bucket_name:string):
+    def __init__(self, bucket_name):
         self.s3 = boto3.resource('s3')
         self.bucket_name = bucket_name
 
-    def upload(self, local_file_path:string, upload_path:string):
-        self.s3.Object(self.bucket_name, upload_path).put(Body = open(local_file_path, 'rb'))
+    def upload(self, local_file_path, upload_path):
+        #self.s3.Object(self.bucket_name, upload_path).put(Body = open(local_file_path, 'rb'))
+        return ''
 
     def exists(self, path):
         bucket = self.s3.Bucket(self.bucket_name)
