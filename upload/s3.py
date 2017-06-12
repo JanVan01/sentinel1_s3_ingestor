@@ -1,4 +1,5 @@
 import boto3
+import boto3.session
 import sys
 import credentials
 import os
@@ -13,8 +14,10 @@ class S3Uploader(BaseUploader):
     def __init__(self, bucket_name):
         #self.conn = boto.connect_s3(AWS_ACCESS_KEY_ID,  AWS_SECRET_ACCESS_KEY, host="s3-eu-central-1.amazonaws.com")
         self.bucket_name = bucket_name
+        session = boto3.session.Session(region_name='eu-central-1')
         self.client = boto3.client(
             's3',
+            config=boto3.session.Config(signature_version='s3v4'),
             # Hard coded strings as credentials, not recommended.
             aws_access_key_id=AWS_ACCESS_KEY_ID,
             aws_secret_access_key=AWS_SECRET_ACCESS_KEY
