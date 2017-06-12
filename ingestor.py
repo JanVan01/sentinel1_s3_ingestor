@@ -6,18 +6,17 @@ import credentials
 
 
 class Ingestor:
-    def __init__(self, api, uploader):
+    def __init__(self, api):
         self.__api = api
         self.__uploader = uploader
 
     def ingest(self):
         result = self.__api.search()
-        path = self.__api.download(result)
-        #self.__uploader.upload(path, "path/on/server")
+        self.__api.download(result)
 
 
 if __name__ == '__main__':
-    api = CopernicusAPI(credentials.copernicus_hub['username'], credentials.copernicus_hub['password'])
     uploader = S3Uploader(credentials.s3_bucket['name'])
-    ingestor = Ingestor(api, uploader)
+    api = CopernicusAPI(credentials.copernicus_hub['username'], credentials.copernicus_hub['password'], uploader)
+    ingestor = Ingestor(api)
     ingestor.ingest()
