@@ -27,7 +27,7 @@ class S3Uploader(BaseUploader):
         upload_path = local_file_path[-71:]
         # TODO: check if file exists on bucket
         #print self.s3.Object(self.bucket_name, upload_path).put(Body = open(local_file_path, 'rb'))
-        print "uploading %s to %s bucket" % (local_file_path, self.bucket_name)
+        print("uploading %s to %s bucket" % (local_file_path, self.bucket_name))
 
         self.client.upload_file(local_file_path, self.bucket_name, upload_path)
 
@@ -52,4 +52,4 @@ class S3Uploader(BaseUploader):
         sys.stdout.flush()
 
     def mycb(self, so_far, total):
-        print '%d bytes transferred out of %d' % (so_far, total)
+        print('%d bytes transferred out of %d' % (so_far, total))

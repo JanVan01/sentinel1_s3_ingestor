@@ -1,11 +1,10 @@
 from api.base import BaseAPI
 from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt, InvalidChecksumError
 
-from upload.s3 import S3Uploader
-import credentials
 import os
 
 INITIAL_DATE = '20170609'
+
 
 class CopernicusAPI(BaseAPI):
     def __init__(self, user, password, uploader):
@@ -27,23 +26,23 @@ class CopernicusAPI(BaseAPI):
             try:
                 # save file on local fs
                 # verify the downloaded file's integrity by checking its MD5 checksum
-                print "downloading %s" % product
+                print("downloading %s" % product)
                 downloadResults = self.__api.download(product, checksum=True)
                 # downloadedProducts.append(downloadResults['path'])
 
                 # upload file to s3
-                print "uploading %s" % product
+                print("uploading %s" % product)
                 self.upload(downloadResults['path'])
 
                 # remove local file from fs
-                print "removing %s" % product
+                print("removing %s" % product)
                 self.remove(downloadResults['path'])
             except InvalidChecksumError:
-                print "ERROR: Invalid checksum, skipping %" % product
+                print("ERROR: Invalid checksum, skipping %ds" % product)
         return downloadedProducts
 
     def upload(self, path):
-        self.__uploader.upload(path);
+        self.__uploader.upload(path)
 
     def remove(self, filename):
         try:

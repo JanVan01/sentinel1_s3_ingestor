@@ -1,6 +1,4 @@
-from api.base import BaseAPI
 from api.copernicus import CopernicusAPI
-from upload.base import BaseUploader
 from upload.s3 import S3Uploader
 import credentials
 
