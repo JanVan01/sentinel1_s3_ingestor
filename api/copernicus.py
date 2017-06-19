@@ -3,48 +3,29 @@ from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt, Inva
 
 import os
 
-INITIAL_DATE = '20170609'
+INITIAL_DATE = '20170618'
 
 
 class CopernicusAPI(BaseAPI):
-    def __init__(self, user, password, uploader):
+    def __init__(self, user, password):
         self.__api = SentinelAPI(user=user, password=password)
-        self.__uploader = uploader
 
     def search(self):
         # loading search extend
         footprint = geojson_to_wkt(read_geojson('extend.geojson'))
-        results = self.__api.query(area=footprint, initial_date=INITIAL_DATE, platformname='Sentinel-1',
+        return self.__api.query(area=footprint, initial_date=INITIAL_DATE, platformname='Sentinel-1',
                                    producttype='GRD')
-        return results
 
-    # start downloading
-    def download(self, products):
-        downloadedProducts = []
-        for product in products:
-            # download product,
-            try:
-                # save file on local fs
-                # verify the downloaded file's integrity by checking its MD5 checksum
-                print("downloading %s" % product)
-                downloadResults = self.__api.download(product, checksum=True)
-                # downloadedProducts.append(downloadResults['path'])
-
-                # upload file to s3
-                print("uploading %s" % product)
-                self.upload(downloadResults['path'])
-
-                # remove local file from fs
-                print("removing %s" % product)
-                self.remove(downloadResults['path'])
-            except InvalidChecksumError:
-                print("ERROR: Invalid checksum, skipping %ds" % product)
-        return downloadedProducts
-
-    def upload(self, path):
-        self.__uploader.upload(path)
+    def download(self, product_id):
+        try:
+            print("downloading %s" % product_id)
+            product_info = self.__api.download(product_id, checksum=True)
+            return product_info['path']
+        except InvalidChecksumError:
+            print("ERROR: Invalid checksum, skipping product %s" % product_id)
 
     def remove(self, filename):
+        print("removing %s" % filename)
         try:
             os.remove(filename)
         except OSError:
