@@ -1,55 +1,57 @@
+import os
+import threading
 import boto3
 import boto3.session
 import sys
+
+from boto3.s3.transfer import S3Transfer
+
 import credentials
-import os
 
 from upload.base import BaseUploader
 
 AWS_ACCESS_KEY_ID = credentials.aws['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = credentials.aws['AWS_SECRET_ACCESS_KEY']
 
+
 class S3Uploader(BaseUploader):
 
     def __init__(self, bucket_name):
-        #self.conn = boto.connect_s3(AWS_ACCESS_KEY_ID,  AWS_SECRET_ACCESS_KEY, host="s3-eu-central-1.amazonaws.com")
         self.bucket_name = bucket_name
-        session = boto3.session.Session(region_name='eu-central-1')
         self.client = boto3.client(
             's3',
+            region_name='eu-central-1',
             config=boto3.session.Config(signature_version='s3v4'),
             # Hard coded strings as credentials, not recommended.
             aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY
-        )
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
 
-    def upload(self, local_file_path, upload_path=''):
-        upload_path = local_file_path[-71:]
-        # TODO: check if file exists on bucket
-        #print self.s3.Object(self.bucket_name, upload_path).put(Body = open(local_file_path, 'rb'))
-        print "uploading %s to %s bucket" % (local_file_path, self.bucket_name)
-
-        self.client.upload_file(local_file_path, self.bucket_name, upload_path)
-
-        # bucket = self.conn.get_bucket(self.bucket_name, validate=False)
-        # key = boto.s3.key.Key(bucket, local_file_path)
-        # with open(local_file_path) as f:
-        #     key.send_file(f, cb=self.percent_cb, num_cb=10)
-
+    def upload(self, local_file_path, upload_path):
+        print("uploading file %s to bucket %s" % (local_file_path, self.bucket_name))
+        transfer = S3Transfer(self.client)
+        transfer.upload_file(filename=local_file_path, bucket=self.bucket_name, key=upload_path,
+                                callback=ProgressPercentage(local_file_path))
 
     def exists(self, path):
-        bucket = self.s3.Bucket(self.bucket_name)
-        return len(list(bucket.objects.filter(Prefix=path))) > 0
+        response = self.client.list_objects(Bucket=self.bucket_name, Prefix=path)
+        return 'Content' in response
 
-        #try:
-        #    self.s3.Object(self.bucket, path).load()
-        #except botocore.exceptions.ClientError:
-        #    return False
-        #return True
 
-    def percent_cb(self, complete, total):
-        sys.stdout.write('.')
-        sys.stdout.flush()
+class ProgressPercentage(object):
+    def __init__(self, filename):
+        self._filename = filename
+        self._size = float(os.path.getsize(filename))
+        self._seen_so_far = 0
+        self._lock = threading.Lock()
 
-    def mycb(self, so_far, total):
-        print '%d bytes transferred out of %d' % (so_far, total)
+    def __call__(self, bytes_amount):
+        # To simplify we'll assume this is hooked up
+        # to a single filename.
+        with self._lock:
+            self._seen_so_far += bytes_amount
+            percentage = (self._seen_so_far / self._size) * 100
+            sys.stdout.write(
+                "\r%s  %s / %s  (%.2f%%)" % (
+                    self._filename, self._seen_so_far, self._size,
+                    percentage))
+            sys.stdout.flush()
