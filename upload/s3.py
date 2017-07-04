@@ -2,6 +2,7 @@ import os
 import threading
 import boto3
 import boto3.session
+import botocore
 import sys
 
 from boto3.s3.transfer import S3Transfer
@@ -20,8 +21,22 @@ class S3Uploader(BaseUploader):
                              callback=ProgressPercentage(local_file_path))
 
     def exists(self, path):
-        response = self.client.list_objects(Bucket=self.bucket_name, Prefix=path)
-        return 'Content' in response
+        s3 = boto3.resource('s3')
+        exists = False
+
+        try:
+            s3.Object(self.bucket_name, path).load()
+        except botocore.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == "404":
+                exists = False
+            else:
+                raise
+        else:
+            exists = True
+
+        print(exists)
+
+        return exists
 
 
 class ProgressPercentage(object):
