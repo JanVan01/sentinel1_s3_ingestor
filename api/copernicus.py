@@ -8,7 +8,7 @@ class CopernicusAPI(BaseAPI):
     def __init__(self, user, password):
         self.__api = SentinelAPI(user=user, password=password)
 
-    def search(self, start='NOW-2DAYS', end='NOW'):
+    def search(self, start='20170101', end='NOW'):
         # loading search extend
         footprint = geojson_to_wkt(read_geojson('extend.geojson'))
         return self.__api.query(area=footprint, initial_date=start, end_date=end, platformname='Sentinel-1',

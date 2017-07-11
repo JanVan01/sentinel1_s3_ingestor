@@ -12,7 +12,7 @@ from upload.base import BaseUploader
 class S3Uploader(BaseUploader):
     def __init__(self, bucket_name):
         self.bucket_name = bucket_name
-        self.client = boto3.client('s3')
+        self.client = boto3.client('s3', region_name='eu-central-1')
 
     def upload(self, local_file_path, upload_path):
         print("uploading file %s to bucket %s" % (local_file_path, self.bucket_name))
@@ -21,23 +21,22 @@ class S3Uploader(BaseUploader):
                              callback=ProgressPercentage(local_file_path))
 
     def exists(self, path):
-        s3 = boto3.resource('s3')
-        exists = False
+	print "checking if file exists..."
+	s3 = boto3.resource('s3', region_name='eu-central-1')
+	exists = False
 
-        try:
-            s3.Object(self.bucket_name, path).load()
-        except botocore.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == "404":
-                exists = False
-            else:
-                raise
-        else:
-            exists = True
+	try:
+		s3.Object(self.bucket_name, path).load()
+	except botocore.exceptions.ClientError as e:
+		if e.response['Error']['Code'] == "404":
+			exists = False
+		else:
+			raise e
+	else:
+		exists = True
 
-        print(exists)
-
-        return exists
-
+	print(exists)
+	return exists
 
 class ProgressPercentage(object):
     def __init__(self, filename):
