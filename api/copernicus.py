@@ -3,18 +3,18 @@ from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt, Inva
 
 import os
 
-INITIAL_DATE = '20170618'
-
 
 class CopernicusAPI(BaseAPI):
     def __init__(self, user, password):
         self.__api = SentinelAPI(user=user, password=password)
 
-    def search(self):
+    def search(self, start='20170101', end='NOW'):
         # loading search extend
-        footprint = geojson_to_wkt(read_geojson('extend.geojson'))
-        return self.__api.query(area=footprint, initial_date=INITIAL_DATE, platformname='Sentinel-1',
-                                   producttype='GRD')
+        dir = os.path.dirname(__file__)
+	extend_path =  os.path.join(dir, "nrw.geojson")
+	footprint = geojson_to_wkt(read_geojson(extend_path))
+        return self.__api.query(area=footprint, initial_date=start, end_date=end, platformname='Sentinel-1',
+                                producttype='GRD')
 
     def download(self, product_id):
         try:
