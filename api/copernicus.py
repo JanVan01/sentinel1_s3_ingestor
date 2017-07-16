@@ -11,8 +11,8 @@ class CopernicusAPI(BaseAPI):
     def search(self, start='20170101', end='NOW'):
         # loading search extend
         dir = os.path.dirname(__file__)
-	extend_path =  os.path.join(dir, "nrw.geojson")
-	footprint = geojson_to_wkt(read_geojson(extend_path))
+        extend_path = os.path.join(dir, "nrw.geojson")
+        footprint = geojson_to_wkt(read_geojson(extend_path))
         return self.__api.query(area=footprint, initial_date=start, end_date=end, platformname='Sentinel-1',
                                 producttype='GRD')
 
