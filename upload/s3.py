@@ -22,7 +22,6 @@ class S3Uploader(BaseUploader):
                              callback=ProgressPercentage(local_file_path))
 
     def exists(self, path):
-        print("checking if file exists...")
         s3 = boto3.resource('s3', region_name='eu-central-1')
 
         try:

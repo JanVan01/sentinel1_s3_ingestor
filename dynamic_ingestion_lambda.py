@@ -8,6 +8,7 @@ uploader = S3Uploader(credentials.s3_bucket['name'])
 
 
 def start_instance(instance_id):
+    print("starting the instance")
     ec2 = boto3.resource('ec2')
     instance = ec2.Instance(instance_id)
     if instance.state['Name'] != 'running':
@@ -15,6 +16,7 @@ def start_instance(instance_id):
 
 
 def handler(event, context):
+    print('searching for data sets')
     results = api.search()
     for uuid, details in results.items():
         if not uploader.exists(details['filename']):
