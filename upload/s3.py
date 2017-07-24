@@ -12,14 +12,16 @@ from upload.base import BaseUploader
 
 class S3Uploader(BaseUploader):
     def __init__(self, bucket_name):
+        super().__init__()
         self.bucket_name = bucket_name
         self.client = boto3.client('s3', region_name='eu-central-1')
 
     def upload(self, local_file_path, upload_path):
-        print("uploading file %s to bucket %s" % (local_file_path, self.bucket_name))
+        self._logger.info('Uploading file %s to bucket %s' % (local_file_path, self.bucket_name))
         transfer = S3Transfer(self.client)
         transfer.upload_file(filename=local_file_path, bucket=self.bucket_name, key=upload_path,
                              callback=ProgressPercentage(local_file_path))
+        self._logger.info('Upload completed')
 
     def exists(self, path):
         s3 = boto3.resource('s3', region_name='eu-central-1')
@@ -27,7 +29,7 @@ class S3Uploader(BaseUploader):
         try:
             s3.Object(self.bucket_name, path).load()
         except botocore.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == "404":
+            if e.response['Error']['Code'] == '404':
                 return False
             else:
                 raise e
@@ -49,7 +51,7 @@ class ProgressPercentage(object):
             self._seen_so_far += bytes_amount
             percentage = (self._seen_so_far / self._size) * 100
             sys.stdout.write(
-                "\r%s  %s / %s  (%.2f%%)" % (
+                '\r%s  %s / %s  (%.2f%%)' % (
                     self._filename, self._seen_so_far, self._size,
                     percentage))
             sys.stdout.flush()
