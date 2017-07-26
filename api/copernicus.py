@@ -9,7 +9,7 @@ class CopernicusAPI(BaseAPI):
         super().__init__()
         self.__api = SentinelAPI(user=user, password=password)
 
-    def search(self, start='20170101', end='NOW'):
+    def search(self, start='NOW-7DAYS', end='NOW'):
         self._logger.info('Searching for new data sets')
 
         # loading search extend
