@@ -26,6 +26,7 @@ class Ingestor:
                 if download_path:
                     self.__uploader.upload(download_path, details['filename'])
                     self.__api.remove(download_path)
+        self._logger.info('Ingestion Completed')
 
 if __name__ == '__main__':
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
