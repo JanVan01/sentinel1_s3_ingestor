@@ -54,7 +54,12 @@ if __name__ == '__main__':
 
     ec2 = boto3.resource('ec2', region_name="eu-central-1")
     instance = ec2.Instance(credentials.ec2_instance['id'])
-    user_data = b64decode(instance.describe_attribute(Attribute='userData')['UserData']['Value']).decode('utf-8')
+
+    if 'Value' in instance.describe_attribute(Attribute='userData')['UserData']:
+        user_data = b64decode(instance.describe_attribute(Attribute='userData')['UserData']['Value']).decode('utf-8')
+    else:
+        user_data = ''
+
     if user_data != 'dev':
         logging.getLogger(__name__).info('Shutting down instance')
         instance.stop()
