@@ -1,7 +1,8 @@
 import boto3
-from api.copernicus import CopernicusAPI
-from upload.s3 import S3Uploader
+
 import credentials
+from sentinel_s3_ingestor.api import CopernicusAPI
+from sentinel_s3_ingestor.upload.s3 import S3Uploader
 
 api = CopernicusAPI(credentials.copernicus_hub['username'], credentials.copernicus_hub['password'])
 uploader = S3Uploader(credentials.s3_bucket['name'])

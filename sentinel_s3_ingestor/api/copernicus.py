@@ -1,7 +1,8 @@
-from api.base import BaseAPI
+import os
+
 from sentinelsat.sentinel import SentinelAPI, read_geojson, geojson_to_wkt, InvalidChecksumError, SentinelAPIError
 
-import os
+from sentinel_s3_ingestor.api.base import BaseAPI
 
 
 class CopernicusAPI(BaseAPI):

@@ -1,13 +1,13 @@
 import os
+import sys
 import threading
+
 import boto3
 import boto3.session
 import botocore
-import sys
-
 from boto3.s3.transfer import S3Transfer
 
-from upload.base import BaseUploader
+from sentinel_s3_ingestor.upload.base import BaseUploader
 
 
 class S3Uploader(BaseUploader):
