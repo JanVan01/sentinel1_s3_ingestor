@@ -211,3 +211,5 @@ ENV/
 credentials.py
 
 *.zip
+
+log.txt*

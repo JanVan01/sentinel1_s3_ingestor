@@ -1,4 +1,9 @@
+import logging
+
 class BaseAPI:
+    def __init__(self):
+        self._logger = logging.getLogger("s1_ingestor.api")
+
     def search(self):
         raise NotImplementedError("This method is not implemented in the base class")
 
