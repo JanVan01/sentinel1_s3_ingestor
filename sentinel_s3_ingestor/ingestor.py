@@ -1,8 +1,11 @@
 import logging
 
+from sentinel_s3_ingestor.api.base import BaseAPI
+from sentinel_s3_ingestor.upload.base import BaseUploader
+
 
 class Ingestor:
-    def __init__(self, api, uploader):
+    def __init__(self, api:BaseAPI, uploader:BaseUploader):
         self.__api = api
         self.__uploader = uploader
         self._logger = logging.getLogger('s1_ingestor.ingestor')
